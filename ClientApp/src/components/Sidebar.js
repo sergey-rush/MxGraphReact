@@ -12,6 +12,7 @@ export default class SideBar extends Component {
   componentDidMount() {}
 
   componentDidUpdate() {
+    console.log("SideBar componentDidUpdate");
     this.handleSidebarItems();
   }
 

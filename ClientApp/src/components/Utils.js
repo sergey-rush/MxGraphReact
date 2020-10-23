@@ -831,6 +831,20 @@ export default {
     };
   },
 
+  selectionChanged(config) {
+    const { graph, mxEvent, callback } = config;
+
+    // Installs a handler for single click events in the graph that shows an alert box
+    graph.addListener(mxEvent.CLICK, (sender, evt) => {  //eslint-disable-line
+      //eslint-disable-line
+      const cell = evt.getProperty('cell');
+
+      callback && callback(cell);
+
+      // evt.consume();
+    });
+  },
+
   handleDoubleClick(config) {
     const { graph, mxEvent, callback } = config;
 

@@ -135,6 +135,7 @@ export default class Editor {
       undoFunc,
       copyFunc,
       valueChangeFunc,
+      selectionChanged,
       changeFunc,
       IMAGE_SHAPES,
       CARD_SHAPES,
@@ -205,6 +206,12 @@ export default class Editor {
 
     util.initConnectStyle({
       graph,
+    });
+
+    util.selectionChanged({
+      graph,
+      mxEvent,
+      callback: selectionChanged,
     });
 
     util.handleDoubleClick({

@@ -1,11 +1,12 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
+import MxCell from 'mxgraph';
 import { Container, Col, Row } from "reactstrap";
 import SideBar from "./Sidebar";
 import Toolbar from "./Toolbar";
 import Editor from './Editor';
 import CellView from './CellView';
 
-//import IMAGE_SHAPES from '../shapes/image-shape';
 import IMAGE_SHAPES from '../shapes/basic-shape';
 import CARD_SHAPES from '../shapes/card-shape';
 import SVG_SHAPES from '../shapes/svg-shape.xml';
@@ -19,7 +20,8 @@ export class Diagram extends Component {
     super(props);
 
     this.state = {
-      editor: null
+      editor: null,
+      currentCell:null     
     };
 
     this.graphContainerClickCount = 0;
@@ -44,10 +46,6 @@ export class Diagram extends Component {
       SVG_SHAPES
     });
 
-    // const editor = new Editor({
-    //   container: '#mxcontainer'      
-    // });
-
     this.editor = editor;
 
     window.editor = editor;
@@ -58,7 +56,7 @@ export class Diagram extends Component {
 
     this.editor.renderGraphFromXml(xml);
 
-    this.setState({ editor });
+    this.setState({ editor, currentCell: new MxCell() });
   }
 
   componentWillUnmount() {
@@ -107,11 +105,7 @@ export class Diagram extends Component {
     console.log(`new value: ${newValue}`);
   };
 
-  selectionChanged = (cell) => {
-    console.log('selectionChanged', cell);
-    console.log(`selectionChanged: ${cell}`);
-  };
-
+  
   autoSaveFunc = (xml) => {
     window.autosaveXml = xml;
 
@@ -137,9 +131,14 @@ export class Diagram extends Component {
 
   updateDiagramData = (data) => {
     console.log(`update diagram: ${data}`);
-
-    //message.info('diagram save success');
   }
+
+  selectionChanged = (cell) => {
+    console.log('Diagram selectionChanged', cell);
+    this.setState({currentCell:cell});
+  };
+
+  value="Value From Parent";
 
   render() {
     return (
@@ -161,7 +160,7 @@ export class Diagram extends Component {
           </div>
           </Col>
           <Col xs={2}>            
-            <CellView editor={this.editor} />
+            <CellView editor={this.editor} activeCell ={this.state.currentCell} />
             </Col>
         </Row>
         </div>
@@ -169,41 +168,3 @@ export class Diagram extends Component {
     );
   }
 }
-
-// componentDidMount() {
-//   //let mxClient = mxnspaceobj.mxClient
-//   let mxRubberband = mxnspaceobj.mxRubberband;
-//   let mxKeyHandler = mxnspaceobj.mxKeyHandler;
-//   let mxUtils = mxnspaceobj.mxUtils;
-//   let mxEvent = mxnspaceobj.mxEvent;
-
-//   const container = document.querySelector("#mxcontainer");
-
-//   // Now, the tricky one, because most examples codes directly use the
-//   // following statement :
-//   // let graph = new mxGraph(container);
-//   // which will fail.
-
-//   // Instead, we have to call the mxGraph constructor via mxnspaceobj variable as follows :
-//   let graph = new mxnspaceobj.mxGraph(container);
-
-//   // -- The rest is the same as usually found in examples -- //
-
-//   new mxRubberband(graph);
-//   let parent = graph.getDefaultParent();
-
-//   this.graph = graph;
-
-//   window.graph = graph;
-
-//   //graph.initCustomPort('https://gw.alicdn.com/tfs/TB1PqwZzzDpK1RjSZFrXXa78VXa-200-200.png');
-
-//   graph.getModel().beginUpdate();
-//   try {
-//     const v1 = graph.insertVertex(parent, null, "Start,", 20, 20, 80, 30);
-//     const v2 = graph.insertVertex(parent, null, "End", 200, 150, 80, 30);
-//     const e1 = graph.insertEdge(parent, null, "", v1, v2);
-//   } finally {
-//     graph.getModel().endUpdate();
-//   }
-// }

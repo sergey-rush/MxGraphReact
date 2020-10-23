@@ -1,11 +1,12 @@
 import React, { Component, useState } from "react";
 import PropTypes from "prop-types";
+import MxCell from "mxgraph";
 import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
 
 export default class CellView extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = { editor: null };
   }
 
   componentDidMount() {}
@@ -38,42 +39,41 @@ export default class CellView extends React.Component {
     }, 1000);
   }
 
-  render() {
+  inputChangedHandler(event){
+    console.log("Cell View inputChangedHandler: " + event.value);
+  }
 
-    const {
-        editor
-      } = this.props;
-  
-      const graph = editor && editor.graph;
-      console.log("Cell View");
+  render() {
+    const { editor } = this.props;
+    const graph = editor && editor.graph;
+
+    if (!this.props.activeCell) {
+      return null;
+    }
 
     return (
-      <div>
-        
-          <FormGroup>
-            <Label for="idInput">Id</Label>
-            <Input type="text" name="idInput" id="idInput" placeholder="Id" />
-          </FormGroup>
-          <FormGroup>
-            <Label for="nameInput">Name</Label>
-            <Input
-              type="text"
-              name="nameInput"
-              id="nameInput"
-              placeholder="Name"
-            />
-          </FormGroup>
-          <Button>Submit</Button>
-        
+      <div>        
+        <FormGroup>
+          <Label for="idInput">Id</Label>
+          <Input type="text" name="idInput" id="idInput" value={this.props.activeCell.id} onChange={(event)=>this.inputChangedHandler(event)} placeholder="Id" />
+        </FormGroup>
+        <FormGroup>
+          <Label for="shapeNameInput">Name</Label>
+          <Input type="text" name="shapeNameInput" id="shapeNameInput" value={this.props.activeCell.shapeName} onChange={(event)=>this.inputChangedHandler(event)} placeholder="Name" />
+        </FormGroup>
+        <FormGroup>
+          <Label for="valueInput">Value</Label>
+          <Input type="text" name="valueInput" id="valueInput" value={this.props.activeCell.value} onChange={(event)=>this.inputChangedHandler(event)} placeholder="Value" />
+        </FormGroup>
       </div>
     );
   }
 }
 
 CellView.propTypes = {
-  editor: PropTypes.object,
+  editor: PropTypes.object,  
 };
 
 CellView.defaultProps = {
-  editor: {},
+  editor: {},  
 };
