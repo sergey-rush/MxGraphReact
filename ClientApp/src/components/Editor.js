@@ -11,21 +11,16 @@ export default class Editor {
   }
 
   init(props) {
-    const {
-      container,
-      cellCreatedFunc,
-      valueChangeFunc,
-      selectionChanged,
-    } = props;
+    const { container, cellCreatedFunc, valueChangeFunc } = props;
 
     let containerEle = document.querySelector(container);
-    if (typeof container === 'string') {
+    if (typeof container === "string") {
       containerEle = document.querySelector(container);
     } else {
       containerEle = container;
     }
 
-    let graph = new mxnspaceobj.mxGraph(containerEle);  
+    let graph = new mxnspaceobj.mxGraph(containerEle);
 
     let mxRubberband = mxnspaceobj.mxRubberband;
     let mxUtils = mxnspaceobj.mxUtils;
@@ -48,7 +43,8 @@ export default class Editor {
     let mxStencilRegistry = mxnspaceobj.mxStencilRegistry;
     let mxCell = mxnspaceobj.mxCell;
     let mxClient = mxnspaceobj.mxClient;
-    let mxDragSource = mxnspaceobj.mxDragSource;    
+    let mxDragSource = mxnspaceobj.mxDragSource;
+    let mxClipboard = mxnspaceobj.mxClipboard;
 
     // Disables the built-in context menu
     mxEvent.disableContextMenu(containerEle); // eslint-disable-line
@@ -78,6 +74,7 @@ export default class Editor {
       mxStencil,
       mxStencilRegistry,
       mxClient,
+      mxClipboard,
     });
 
     this.graph = graph;
@@ -88,16 +85,6 @@ export default class Editor {
     this.mxDragSource = mxDragSource;
     this.mxConstraintHandler = mxConstraintHandler;
     this.valueChangeFunc = valueChangeFunc;
-    this.selectionChanged = selectionChanged;
-
-    this.graph.setPanning(true);
-    this.graph.setTooltips(true);
-    this.graph.setConnectable(true);
-    this.graph.setEnabled(true);
-    this.graph.setEdgeLabelsMovable(false);
-    this.graph.setVertexLabelsMovable(false);
-    this.graph.setGridEnabled(true);
-    this.graph.setAllowDanglingEdges(false);
   }
 
   initEditor(config) {
@@ -123,6 +110,7 @@ export default class Editor {
       mxStencil,
       mxStencilRegistry,
       mxClient,
+      mxClipboard,
       clickFunc,
       doubleClickFunc,
       autoSaveFunc,
@@ -131,20 +119,14 @@ export default class Editor {
       undoFunc,
       copyFunc,
       valueChangeFunc,
-      selectionChanged,
       changeFunc,
       IMAGE_SHAPES,
       CARD_SHAPES,
       SVG_SHAPES,
     } = config;
 
-    graph.gridSize = 30;
-
-    //mxTooltipHandler.setTooltips(true);
-    graph.setTooltips(true);
-
     // Disables the built-in context menu
-    mxEvent.disableContextMenu(this.containerEle); // eslint-disable-line
+    //mxEvent.disableContextMenu(this.containerEle); // eslint-disable-line
 
     // Uncomment the following if you want the container
     // to fit the size of the graph
@@ -155,7 +137,7 @@ export default class Editor {
     util.initZoomConfig({ graph });
 
     // config shapes
-    util.configShapes({
+    util.initShapes({
       graph,
       mxUtils,
       mxConstants,
@@ -177,6 +159,7 @@ export default class Editor {
     // copy event listener
     util.copyListener({
       graph,
+      mxClipboard,
       callback: copyFunc,
     });
 
@@ -187,27 +170,21 @@ export default class Editor {
     });
 
     // connector handler
-    util.connectorHandler({
-      graph,
-      mxUtils,
-      mxGraph,
-      mxShape,
-      mxGraphHandler,
-      mxEdgeHandler,
-      mxConnectionConstraint,
-      mxPolyline,
-      mxConstraintHandler,
-      mxConstants,
-    });
+    // util.connectorHandler({
+    //   graph,
+    //   mxUtils,
+    //   mxGraph,
+    //   mxShape,
+    //   mxGraphHandler,
+    //   mxEdgeHandler,
+    //   mxConnectionConstraint,
+    //   mxPolyline,
+    //   mxConstraintHandler,
+    //   mxConstants,
+    // });
 
     util.initConnectStyle({
       graph,
-    });
-
-    util.selectionChanged({
-      graph,
-      mxEvent,
-      callback: selectionChanged,
     });
 
     util.handleDoubleClick({
@@ -216,11 +193,11 @@ export default class Editor {
       callback: doubleClickFunc,
     });
 
-    // util.handleClick({
-    //   graph,
-    //   mxEvent,
-    //   callback: clickFunc,
-    // });
+    util.handleClick({
+      graph,
+      mxEvent,
+      callback: clickFunc,
+    });
 
     // util.handleHover({
     //   graph,
@@ -286,7 +263,7 @@ export default class Editor {
    * @param {*} value the value of style
    */
   updateStyle(cell, key, value) {
-    return util.updateStyle(this.graph, cell, key, value);
+    return util.updateStyle(this.graph, this.mxUtils, cell, key, value);
   }
 
   groupCells(groupId, labelName) {
@@ -384,6 +361,7 @@ export default class Editor {
   getGraphXml() {
     const xml = util.getGraphXml({
       graph: this.graph,
+      mxUtils: this.mxUtils,
     });
 
     const xmlStr = new XMLSerializer().serializeToString(xml); // eslint-disable-line

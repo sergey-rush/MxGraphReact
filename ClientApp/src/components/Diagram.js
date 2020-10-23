@@ -39,7 +39,6 @@ export class Diagram extends Component {
       undoFunc: this.undoFunc,
       copyFunc: this.copyFunc,
       valueChangeFunc: this.valueChangeFunc,
-      selectionChanged: this.selectionChanged,
       IMAGE_SHAPES,
       CARD_SHAPES,
       SVG_SHAPES
@@ -116,8 +115,8 @@ export class Diagram extends Component {
     window.localStorage.setItem('autosaveXml', xml);
   };
 
-  clickFunc = (cell) => {
-    console.log('click', cell);
+  clickFunc = (cell, event) => {
+    this.setState({currentCell:cell});
   };
 
   undoFunc = (histories) => {
@@ -130,23 +129,17 @@ export class Diagram extends Component {
 
   updateDiagramData = (data) => {
     console.log(`update diagram: ${data}`);
-  }
-
-  selectionChanged = (cell) => {
-    this.setState({currentCell:cell});
-  };
-
-  value="Value From Parent";
+  } 
 
   render() {
     return (
       <Container fluid> 
       <div className="editor-container">
         <Row>
-          <Col xs={2}>
+          <Col xs={1}>
           <SideBar key="sidebar" editor={this.editor} />
           </Col>
-          <Col xs={8}>
+          <Col xs={9}>
           <div className="graph-inner-container">
           {this.editor ? (
                 <Toolbar
