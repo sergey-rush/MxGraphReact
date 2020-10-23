@@ -21,7 +21,7 @@ export default {
    * @param {graph} config 
    */
   initGraph(config) {
-    const { graph, mxUtils } = config;
+    const { graph } = config;
     
     // // Enables HTML labels
     // graph.setHtmlLabels(true);

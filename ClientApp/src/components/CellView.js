@@ -1,9 +1,8 @@
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
-import MxCell from "mxgraph";
-import { Button, Form, FormGroup, Label, Input, FormText } from "reactstrap";
+import { FormGroup, Label, Input } from "reactstrap";
 
-export default class CellView extends React.Component {
+export default class CellView extends Component {
   constructor(props) {
     super(props);
     this.state = { editor: null };
@@ -12,6 +11,7 @@ export default class CellView extends React.Component {
   componentDidMount() {}
 
   componentDidUpdate() {
+    //console.log("CellView componentDidUpdate");
     this.handleSidebarItems();
   }
 
@@ -43,9 +43,7 @@ export default class CellView extends React.Component {
     console.log("Cell View inputChangedHandler: " + event.value);
   }
 
-  render() {
-    const { editor } = this.props;
-    const graph = editor && editor.graph;
+  render() {   
 
     if (!this.props.activeCell) {
       return null;

@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 import MxCell from 'mxgraph';
 import { Container, Col, Row } from "reactstrap";
 import SideBar from "./Sidebar";
@@ -134,7 +133,6 @@ export class Diagram extends Component {
   }
 
   selectionChanged = (cell) => {
-    console.log('Diagram selectionChanged', cell);
     this.setState({currentCell:cell});
   };
 

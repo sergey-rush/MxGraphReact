@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 import PropTypes from "prop-types";
 import IMAGE_SHAPES from "../shapes/basic-shape";
 import "./Sidebar.css"
@@ -12,7 +12,7 @@ export default class SideBar extends Component {
   componentDidMount() {}
 
   componentDidUpdate() {
-    console.log("SideBar componentDidUpdate");
+    //console.log("SideBar componentDidUpdate");
     this.handleSidebarItems();
   }
 

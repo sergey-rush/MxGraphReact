@@ -3,14 +3,6 @@ import PropTypes from 'prop-types';
 
 import './Toolbar.css';
 
-const userGuideText = 'group the cells selected';
-
-// message.config({
-//   top: 60,
-//   duration: 2,
-//   maxCount: 3,
-// });
-
 class Toolbar extends React.Component {
   constructor(props) {
     super(props);
@@ -18,7 +10,7 @@ class Toolbar extends React.Component {
     this.state = {};
   }
 
-  componentWillMount() {
+  componentDidMount() {
     
   }
 

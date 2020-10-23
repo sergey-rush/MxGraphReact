@@ -18,16 +18,14 @@ export default class Editor {
       selectionChanged,
     } = props;
 
-    //let containerEle = document.querySelector(container);
-    // if (typeof container === 'string') {
-    //   containerEle = document.querySelector(container);
-    // } else {
-    //   containerEle = container;
-    // }
+    let containerEle = document.querySelector(container);
+    if (typeof container === 'string') {
+      containerEle = document.querySelector(container);
+    } else {
+      containerEle = container;
+    }
 
-    //const graph = new mxGraph(containerEle); // eslint-disable-line
-    let containerEle = document.querySelector(".graph-content");
-    let graph = new mxnspaceobj.mxGraph(containerEle);
+    let graph = new mxnspaceobj.mxGraph(containerEle);  
 
     let mxRubberband = mxnspaceobj.mxRubberband;
     let mxUtils = mxnspaceobj.mxUtils;
@@ -50,14 +48,12 @@ export default class Editor {
     let mxStencilRegistry = mxnspaceobj.mxStencilRegistry;
     let mxCell = mxnspaceobj.mxCell;
     let mxClient = mxnspaceobj.mxClient;
-    let mxDragSource = mxnspaceobj.mxDragSource;
-
-    new mxRubberband(graph);
+    let mxDragSource = mxnspaceobj.mxDragSource;    
 
     // Disables the built-in context menu
     mxEvent.disableContextMenu(containerEle); // eslint-disable-line
     mxVertexHandler.prototype.rotationEnabled = true; // eslint-disable-line
-
+    new mxRubberband(graph);
     this.containerEle = containerEle;
 
     this.initEditor({
@@ -154,7 +150,7 @@ export default class Editor {
     // to fit the size of the graph
     // graph.setResizeContainer(true);
 
-    util.initGraph({ graph, mxUtils });
+    util.initGraph({ graph });
 
     util.initZoomConfig({ graph });
 
