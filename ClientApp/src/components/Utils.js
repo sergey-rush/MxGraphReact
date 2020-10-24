@@ -11,7 +11,7 @@ import mxStencil from "mxgraph";
 import mxRectangle from "mxgraph";
 import mxImage from "mxgraph";
 import MxEllipse from "mxgraph";
-import MxConnectionConstraint from "mxgraph";
+import MxOutline from "mxgraph";
 import MxCell from "mxgraph";
 import MxGeometry from "mxgraph";
 import MxCodec from "mxgraph";
@@ -250,6 +250,12 @@ export default {
         }
       }
     }
+  },
+
+  initPreview(config) {
+    const {graph, preview, callback} = config;
+    let outln = new MxOutline(graph, preview);
+    callback && callback(outln);
   },
 
   initSidebar(config) {

@@ -211,7 +211,7 @@ export default class Editor {
     });
   }
 
-  // init sidebar
+  
   initSidebar(sidebarItems) {
     return util.initSidebar({
       graph: this.graph,
@@ -222,7 +222,14 @@ export default class Editor {
       sidebarItems,
       cellCreatedFunc: this.cellCreatedFunc,
     });
-  }  
+  }
+
+  initPreview(preview) {
+    return util.initPreview({
+      graph: this.graph,
+      preview
+    });
+  } 
 
   /**
    * zoom

@@ -5,6 +5,7 @@ import SideBar from "./Sidebar";
 import Toolbar from "./Toolbar";
 import Editor from './Editor';
 import CellView from './CellView';
+import Preview from './Preview';
 
 import IMAGE_SHAPES from '../shapes/basic-shape';
 import CARD_SHAPES from '../shapes/card-shape';
@@ -136,6 +137,7 @@ export class Diagram extends Component {
         <Row>
           <Col xs={1}>
           <SideBar key="sidebar" editor={this.editor} />
+          <Preview key="preview" editor={this.editor} />
           </Col>
           <Col xs={10}>
           <div className="graph-inner-container">

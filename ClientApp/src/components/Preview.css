@@ -1,0 +1,9 @@
+.preview{  
+  z-index:10;  
+  overflow:hidden;
+  width: 150px;
+  height:260px;
+  background:transparent;
+  border-style:solid;
+  border-color:lightgray;
+}
