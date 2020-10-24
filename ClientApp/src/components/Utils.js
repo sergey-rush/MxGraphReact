@@ -263,8 +263,7 @@ export default {
       cellCreatedFunc,
     } = config;
 
-    sidebarItems &&
-      sidebarItems.forEach((item) => {
+    sidebarItems && sidebarItems.forEach((item) => {
         const width = item.getAttribute("data-shape-width");
         const height = item.getAttribute("data-shape-height");
         const shapeType = item.getAttribute("data-shape-type");

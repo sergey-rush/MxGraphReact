@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import IMAGE_SHAPES from "../shapes/basic-shape";
+//import IMAGE_SHAPES from "../shapes/card-shape";
 import "./Sidebar.css"
 
 export default class SideBar extends Component {
