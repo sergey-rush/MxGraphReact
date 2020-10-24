@@ -149,25 +149,25 @@ export default class Editor {
     });
 
     // undo event listener
-    util.undoListener({
-      graph,
-      mxEvent,
-      mxUndoManager,
-      callback: undoFunc,
-    });
+    // util.undoListener({
+    //   graph,
+    //   mxEvent,
+    //   mxUndoManager,
+    //   callback: undoFunc,
+    // });
 
     // copy event listener
-    util.copyListener({
-      graph,
-      mxClipboard,
-      callback: copyFunc,
-    });
+    // util.copyListener({
+    //   graph,
+    //   mxClipboard,
+    //   callback: copyFunc,
+    // });
 
     // delete event listener
-    util.deleteListener({
-      graph,
-      callback: deleteFunc,
-    });
+    // util.deleteListener({
+    //   graph,
+    //   callback: deleteFunc,
+    // });
 
     // connector handler
     // util.connectorHandler({
@@ -183,9 +183,9 @@ export default class Editor {
     //   mxConstants,
     // });
 
-    util.initConnectStyle({
-      graph,
-    });
+    // util.initConnectStyle({
+    //   graph,
+    // });
 
     util.handleDoubleClick({
       graph,
@@ -239,10 +239,7 @@ export default class Editor {
 
   // custom port, 10x10px
   initCustomPort(pic) {
-    return util.initCustomPort({
-      pic,
-      mxConstraintHandler: this.mxConstraintHandler,
-    });
+    return util.initCustomPort({pic, mxConstraintHandler: this.mxConstraintHandler, });
   }
 
   /**

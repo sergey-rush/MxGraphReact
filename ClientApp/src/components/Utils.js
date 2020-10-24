@@ -368,23 +368,18 @@ export default {
 
   deleteListener(config) {
     const { graph, callback } = config;
-
     const { removeCells } = graph;
     graph.removeCells = function (cells) {
       const result = removeCells.apply(this, [cells]);
       callback && callback(cells);
       return result;
     };
-
     this.deleteListenerFunc2 = this.deleteListenerFunc.bind(this, graph);
-
     document.body.addEventListener('keydown', this.deleteListenerFunc2);
   },
 
   deleteListenerFunc(graph, e) {
-    if (
-      !(e.target === e.currentTarget || graph.container.contains(e.target))
-    ) {
+    if (!(e.target === e.currentTarget || graph.container.contains(e.target))) {
       return false;
     }
 
@@ -392,7 +387,7 @@ export default {
 
     const evtobj = window.event ? window.event : e;
     if (evtobj.keyCode === 46 || evtobj.keyCode === 8) {
-      // 没有cell当前在编辑状态时才可删除
+      // No any cell can be deleted while editing
       if (!editingCell) {
         const cellsSelected = graph.getSelectionCells();
         // cellsSelected && cellsSelected.length && graph.removeCells(cellsSelected);
@@ -476,11 +471,11 @@ export default {
     // Disables automatic handling of ports. This disables the reset of the
     // respective style in mxGraph.cellConnected. Note that this feature may
     // be useful if floating and fixed connections are combined.
-    graph.setPortsEnabled(false);
+    //graph.setPortsEnabled(false);
+    graph.setPortsEnabled(true);
 
     // Disables floating connections (only connections via ports allowed)
-    graph.connectionHandler.isConnectableCell = function (cell) {  
-      
+    graph.connectionHandler.isConnectableCell = function (cell) { 
       return false;
     };
 
@@ -498,16 +493,12 @@ export default {
     //   return selectCells.apply(this, arguments);
     // }
 
-    mxEdgeHandler.prototype.isConnectableCell = function (cell) {  
-      
+    mxEdgeHandler.prototype.isConnectableCell = function (cell) { 
       return graph.connectionHandler.isConnectableCell(cell);
     };
 
     // Overridden to define per-shape connection points
-    mxGraph.prototype.getAllConnectionConstraints = function (  
-      terminal,
-      source  
-    ) {
+    mxGraph.prototype.getAllConnectionConstraints = function (terminal, source) {
       
       // if (terminal && terminal.shape && terminal.shape.constraints) {
       //   return terminal.shape.constraints;
@@ -859,9 +850,7 @@ export default {
 
   handleChange(config) {
     const { graph, mxEvent, callback } = config;
-    graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) => {  
-      
-      // console.log('change', sender, evt);
+    graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) => { 
       callback && callback();
     });
   },
@@ -1232,12 +1221,12 @@ export default {
   },
 
   /**
-   * 节点重命名监听器
+   * vertex Rename Listener
    */
   vertexRenameListener({ callback, mxCell }) {
     mxCell.prototype.valueChangedCallback = callback; 
 
-    // 若没重写过 valueChanged 方法则重写
+    // If not rewritten valueChanged method rewrite
     if (!mxCell.prototype.hasRewriteValueChanged) {  
       
       mxCell.prototype.hasRewriteValueChanged = true; 
@@ -1254,14 +1243,14 @@ export default {
   },
 
   /**
-   * 重命名一个cell
-   * @param {*} newName 新名字（labelName）
+   * Rename cell
+   * @param {*} newName New name（labelName）
    * @param {*} cell cell
-   * @param {*} graph cell 归属的 graph
+   * @param {*} graph cell attributable graph
    */
   renameCell(newName, cell, graph) {
     cell.value = newName;
-    graph.refresh(); // 重新渲染graph
+    graph.refresh(); // Re-render graph
   },
 
   /**
