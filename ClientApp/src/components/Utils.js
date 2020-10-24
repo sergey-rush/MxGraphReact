@@ -547,55 +547,12 @@ export default {
     }
   },
 
-  //  Init popmenu
-  initPopupMenu(config) {
-    const { graph, mxUtils } = config;
-
-    // Installs a popupmenu handler using local function (see below).
-    graph.popupMenuHandler.factoryMethod = (menu, cell, evt) =>
-      createPopupMenu(graph, menu, cell, evt);
-
-    // Function to create the entries in the popupmenu
-    function createPopupMenu(graph, menu, cell, evt) {
-      if (cell != null) {
-        menu.addItem(
-          "Cell Item",
-          "https://img.alicdn.com/tfs/TB1xSANXXzqK1RjSZFvXXcB7VXa-22-22.png",
-          () => {
-            mxUtils.alert("MenuItem1");
-          }
-        );
-      } else {
-        menu.addItem(
-          "No-Cell Item",
-          "https://img.alicdn.com/tfs/TB1CFkNXmzqK1RjSZPxXXc4tVXa-22-22.png",
-          () => {
-            mxUtils.alert("MenuItem2");
-          }
-        );
-      }
-      menu.addSeparator();
-      menu.addItem(
-        "MenuItem3",
-        "https://img.alicdn.com/tfs/TB1CFkNXmzqK1RjSZPxXXc4tVXa-22-22.png",
-        () => {
-          mxUtils.alert(`MenuItem3: ${graph.getSelectionCount()} selected`);
-        }
-      );
-    }
-  },
-
   handleDoubleClick(config) {
     const { graph, mxEvent, callback } = config;
-
-    // Installs a handler for double click events in the graph
-    // that shows an alert box
+    // Installs a handler for double click events in the graph that shows an alert box
     graph.addListener(mxEvent.DOUBLE_CLICK, (sender, evt) => {
       const cell = evt.getProperty("cell");
-
       callback && callback(cell);
-
-      // evt.consume();
     });
   },
 
@@ -631,7 +588,7 @@ export default {
     const { graph, callback } = config;
 
     const mgr = new mxAutoSaveManager(graph);
-    mgr.autoSaveDelay = 0; // 自动保存延迟时间设为0
+    mgr.autoSaveDelay = 0; // Auto save delay time is set to 0
     mgr.save = () => {
       const xml = this.getGraphXml({
         graph,
@@ -685,10 +642,7 @@ export default {
         if (idsArr.indexOf(cellId) === -1) {
           idsArr.push(cellId);
         } else {
-          console.warn(
-            "cell id is duplicated, delete the needless one",
-            element
-          );
+          console.warn("cell id is duplicated, delete the needless one", element);
           rootEle.removeChild(element);
         }
 
@@ -697,10 +651,7 @@ export default {
           element.getAttribute("vertex") === "1" &&
           element.getAttribute("edge") === "1"
         ) {
-          console.warn(
-            "cell's property vertex and edge cannot both be 1, set property edge to 0",
-            element
-          );
+          console.warn("cell's property vertex and edge cannot both be 1, set property edge to 0", element);
           element.setAttribute("edge", 0);
         }
       });
@@ -738,10 +689,7 @@ export default {
     node.setAttribute("gridSize", graph.gridSize);
     node.setAttribute("guides", graph.graphHandler.guidesEnabled ? "1" : "0");
     node.setAttribute("tooltips", graph.tooltipHandler.isEnabled() ? "1" : "0");
-    node.setAttribute(
-      "connect",
-      graph.connectionHandler.isEnabled() ? "1" : "0"
-    );
+    node.setAttribute("connect", graph.connectionHandler.isEnabled() ? "1" : "0");
     node.setAttribute("arrows", graph.connectionArrowsEnabled ? "1" : "0");
     node.setAttribute("fold", graph.foldingEnabled ? "1" : "0");
     node.setAttribute("page", graph.pageVisible ? "1" : "0");
@@ -756,7 +704,7 @@ export default {
     return node;
   },
 
-  // 从 xml 渲染 graph
+  // From xml rendering graph
   renderGraphFromXml(config) {
     const { graph, mxUtils, xml } = config;
 

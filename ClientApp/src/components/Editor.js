@@ -23,8 +23,8 @@ export default class Editor {
     let graph = new mxnspaceobj.mxGraph(containerEle);
 
     let mxRubberband = mxnspaceobj.mxRubberband;
-        // Enables rubberband selection
-        new mxRubberband(graph);
+    // Enables rubberband selection
+    new mxRubberband(graph);
     let mxUtils = mxnspaceobj.mxUtils;
     let mxEvent = mxnspaceobj.mxEvent;
     let mxVertexHandler = mxnspaceobj.mxVertexHandler;
