@@ -48,8 +48,6 @@ export class Diagram extends Component {
 
     window.editor = editor;
 
-    //editor.initCustomPort('https://gw.alicdn.com/tfs/TB1PqwZzzDpK1RjSZFrXXa78VXa-200-200.png');
-
     const xml = window.localStorage.getItem('autosaveXml');
 
     this.editor.renderGraphFromXml(xml);

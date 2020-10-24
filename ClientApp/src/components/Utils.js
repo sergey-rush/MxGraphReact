@@ -6,7 +6,7 @@ import GENERAL_SHAPES from '../config/general-shape';
 //import './basic-shapes-generator';
 import MxCellState from 'mxgraph';
 import mxAutoSaveManager from 'mxgraph';
-import mxPoint from 'mxgraph';
+import MxPoint from 'mxgraph';
 import mxStencil from 'mxgraph';
 import mxRectangle from 'mxgraph';
 import mxImage from 'mxgraph';
@@ -15,9 +15,6 @@ import MxConnectionConstraint from 'mxgraph';
 import MxCell from 'mxgraph';
 import MxGeometry from 'mxgraph';
 import MxCodec from 'mxgraph';
-
-
-
 
 export default {
   /**
@@ -35,6 +32,8 @@ export default {
     // graph.panningHandler.ignoreCell = true;
     // graph.container.style.cursor = 'move';
     graph.setPanning(true);
+    graph.graphHandler.scaleGrid = true;				
+    graph.gridSize = 30;
     
     graph.setTooltips(true);
     graph.setConnectable(true);
@@ -44,7 +43,6 @@ export default {
     graph.setGridEnabled(true);
     graph.setAllowDanglingEdges(false);
     graph.setDropEnabled(true);
-    graph.gridSize = 30;
 
     // // Uncomment the following if you want the container
     // // to fit the size of the graph
@@ -55,8 +53,6 @@ export default {
 
     graph.gridSize = 10;
 
-    // Enables rubberband selection
-    //new mxRubberband (graph); 
   },
 
   initShapes(config) {
@@ -67,14 +63,14 @@ export default {
     const { stylesheet } = graph;
     
     const vertexStyle = stylesheet.getDefaultVertexStyle();
-    vertexStyle[mxConstants.STYLE_STROKECOLOR] = '#B9BECC'; 
+    vertexStyle[mxConstants.STYLE_STROKECOLOR] = '#333'; 
     vertexStyle[mxConstants.STYLE_FILLCOLOR] = '#ffffff'; 
-    vertexStyle[mxConstants.STYLE_FONTCOLOR] = '#333'; 
+    vertexStyle[mxConstants.STYLE_FONTCOLOR] = '#000'; 
 
     const edgeStyle = stylesheet.getDefaultEdgeStyle();
-    edgeStyle[mxConstants.STYLE_STROKECOLOR] = '#B9BECC'; 
-    edgeStyle[mxConstants.STYLE_STROKEWIDTH] = 4; 
-    edgeStyle[mxConstants.STYLE_FONTCOLOR] = '#333';
+    edgeStyle[mxConstants.STYLE_STROKECOLOR] = '#333'; 
+    edgeStyle[mxConstants.STYLE_STROKEWIDTH] = 2; 
+    edgeStyle[mxConstants.STYLE_FONTCOLOR] = '#000';
 
     const cardShapes = CARD_SHAPES || DEFAULT_CARD_SHAPES;
     const imageShapes = IMAGE_SHAPES || DEFAULT_IMAGE_SHAPES;
@@ -129,6 +125,124 @@ export default {
         }
       });
   },
+
+  initGrid(config) {
+    const {graph, mxGraphView, mxEvent } = config;
+    
+        var canvas = document.createElement('canvas');
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0px';
+        canvas.style.left = '0px';
+        canvas.style.zIndex = -1;
+        graph.container.appendChild(canvas);
+        
+        // Modify event filtering to accept canvas as container
+        var mxGraphViewIsContainerEvent = mxGraphView.prototype.isContainerEvent;
+        mxGraphView.prototype.isContainerEvent = function(evt)
+        {
+          return mxGraphViewIsContainerEvent.apply(this, arguments) ||
+            mxEvent.getSource(evt) == canvas;
+        };
+      
+      var mxGraphViewValidateBackground = mxGraphView.prototype.validateBackground;
+      mxGraphView.prototype.validateBackground = function()
+      {
+        mxGraphViewValidateBackground.apply(this, arguments);
+        repaintGrid(graph, canvas);
+      };
+      
+      function repaintGrid(graph, canvas) {
+        var ctx = canvas.getContext('2d');
+        var s = 0;
+            var gs = 0;
+            var tr = new MxPoint();
+            var w = 0;
+            var h = 0;
+    
+              if (ctx != null)
+              {
+                var bounds = graph.getGraphBounds();
+                var width = Math.max(bounds.x + bounds.width, graph.container.clientWidth);
+                var height = Math.max(bounds.y + bounds.height, graph.container.clientHeight);
+                var sizeChanged = width != w || height != h;
+                
+                if (graph.view.scale != s || graph.view.translate.x != tr.x || graph.view.translate.y != tr.y ||
+                  gs != graph.gridSize || sizeChanged)
+                {
+                  tr = graph.view.translate.clone();
+                  s = graph.view.scale;
+                  gs = graph.gridSize;
+                  w = width;
+                  h = height;
+                  
+                  // Clears the background if required
+                  if (!sizeChanged)
+                  {
+                    ctx.clearRect(0, 0, w, h);
+                  }
+                  else
+                  {
+                    canvas.setAttribute('width', w);
+                    canvas.setAttribute('height', h);
+                  }
+    
+                  var tx = tr.x * s;
+                  var ty = tr.y * s;
+    
+                  // Sets the distance of the grid lines in pixels
+                  var minStepping = graph.gridSize;
+                  var stepping = minStepping * s;
+    
+                  if (stepping < minStepping)
+                  {
+                    var count = Math.round(Math.ceil(minStepping / stepping) / 2) * 2;
+                    stepping = count * stepping;
+                  }
+    
+                  var xs = Math.floor((0 - tx) / stepping) * stepping + tx;
+                  var xe = Math.ceil(w / stepping) * stepping;
+                  var ys = Math.floor((0 - ty) / stepping) * stepping + ty;
+                  var ye = Math.ceil(h / stepping) * stepping;
+    
+                  xe += Math.ceil(stepping);
+                  ye += Math.ceil(stepping);
+    
+                  var ixs = Math.round(xs);
+                  var ixe = Math.round(xe);
+                  var iys = Math.round(ys);
+                  var iye = Math.round(ye);
+    
+                  // Draws the actual grid
+                  ctx.strokeStyle = '#F4F4F4';
+                  ctx.beginPath();
+                  
+                  for (var x = xs; x <= xe; x += stepping)
+                  {
+                    x = Math.round((x - tx) / stepping) * stepping + tx;
+                    var ix = Math.round(x);
+                    
+                    ctx.moveTo(ix + 0.5, iys + 0.5);
+                    ctx.lineTo(ix + 0.5, iye + 0.5);
+                  }
+    
+                  for (var y = ys; y <= ye; y += stepping)
+                  {
+                    y = Math.round((y - ty) / stepping) * stepping + ty;
+                    var iy = Math.round(y);
+                    
+                    ctx.moveTo(ixs + 0.5, iy + 0.5);
+                    ctx.lineTo(ixe + 0.5, iy + 0.5);
+                  }
+    
+                  ctx.closePath();
+                  ctx.stroke();
+                }
+              }
+            }
+
+  },
+
+
 
   initSidebar(config) {
     const { graph, mxEvent, mxClient, mxUtils, mxDragSource, sidebarItems, cellCreatedFunc } = config;
@@ -226,9 +340,9 @@ export default {
         // is a edge
         if (isEdge) {
           const cell = new MxCell('', new MxGeometry(0, 0, width, height), shapeStyle); 
-          cell.geometry.setTerminalPoint (new mxPoint (0, height), true); 
-          cell.geometry.setTerminalPoint (new mxPoint (width, 0), false); 
-          // cell.geometry.points = [new mxPoint(width/2, height/2), new mxPoint(0, 0)];
+          cell.geometry.setTerminalPoint (new MxPoint (0, height), true); 
+          cell.geometry.setTerminalPoint (new MxPoint (width, 0), false); 
+          // cell.geometry.points = [new MxPoint(width/2, height/2), new MxPoint(0, 0)];
           cell.geometry.relative = true;
           cell.edge = true;
           cell.shapeName = shapeName;
@@ -269,10 +383,8 @@ export default {
     };
 
     // Disables built-in DnD in IE (this is needed for cross-frame DnD, see below)
-    if (mxClient.IS_IE) {  
-      
-      mxEvent.addListener(node, 'dragstart', (evt) => {  
-        
+    if (mxClient.IS_IE) {        
+      mxEvent.addListener(node, 'dragstart', (evt) => {          
         evt.returnValue = false;
       });
     }
@@ -287,9 +399,7 @@ export default {
     // if scalePreview (last) argument is true. Dx and dy are null to force
     // the use of the defaults. Note that dx and dy are only used for the
     // drag icon but not for the preview.
-    const ds = mxUtils.makeDraggable(  
-      
-      node,
+    const ds = mxUtils.makeDraggable( node,
       graphF,
       funct,
       dragElt,
@@ -405,210 +515,6 @@ export default {
           && graph.removeCells(cellsSelectable);
       }
     }
-  },
-
-  initConnectStyle(config) {
-    const { graph } = config;
-
-    console.log("initConnectStyle")
-    graph.setConnectable(true)
-    graph.setAllowDanglingEdges(false)
-    graph.setConnectableEdges(false)
-    graph.setDisconnectOnMove(false)
-    const style = graph.getStylesheet().getDefaultEdgeStyle()
-
-    style['edgeStyle'] = 'orthogonalEdgeStyle'
-    style['curved'] = '1'
-    graph.connectionHandler.createEdgeState = function () {
-      const edge = graph.createEdge();
-      return new MxCellState(graph.view, edge, graph.getCellStyle(edge))
-    }
-    const pointImg = require('../assets/point.gif')
-
-    graph.connectionHandler.constraintHandler.pointImage = new mxImage(pointImg, 10, 10)
-    graph.connectionHandler.isConnectableCell = function () {
-      return false
-    }
-    graph.connectionHandler.constraintHandler.createHighlightShape = function () {
-      return new MxEllipse(null, this.highlightColor, this.highlightColor, 2)
-    }
-    graph.getAllConnectionConstraints = function (terminal) {
-      if (terminal !== null && terminal.shape !== null) {
-        const cell = terminal['cell']
-        const constraints = cell['constraints']
-
-        if (constraints instanceof Array && constraints.length > 0) {
-          return constraints.map((constraint) => new MxConnectionConstraint(new mxPoint(constraint['x'], constraint['y']), constraint['perimeter']))
-        } else {
-          if (terminal.shape.stencil) {
-            return terminal.shape.stencil.constraints
-          } else if (terminal.shape.constraints) {
-            return terminal.shape.constraints
-          }
-        }
-      }
-      return null
-    }
-  },
-
-  connectorHandler(config) {
-    const { 
-        graph,
-        mxUtils,
-        mxGraph, 
-        mxShape, 
-        mxGraphHandler, 
-        mxEdgeHandler, 
-        mxConnectionConstraint, 
-        mxPolyline,
-        mxConstraintHandler,
-        mxConstants
-    } = config;
-
-    graph.setConnectable(true);
-    mxGraphHandler.prototype.guidesEnabled = true; 
-
-    // Disables automatic handling of ports. This disables the reset of the
-    // respective style in mxGraph.cellConnected. Note that this feature may
-    // be useful if floating and fixed connections are combined.
-    //graph.setPortsEnabled(false);
-    graph.setPortsEnabled(true);
-
-    // Disables floating connections (only connections via ports allowed)
-    graph.connectionHandler.isConnectableCell = function (cell) { 
-      return false;
-    };
-
-    // edge animation
-    // const selectCells = mxConnectionHandler.prototype.selectCells;
-
-    // graph.connectionHandler.selectCells = function (edge, target) {
-    //   var state = this.graph.view.getState(edge);
-
-    //   state.shape.node.getElementsByTagName('path')[0].removeAttribute('visibility');
-    //   state.shape.node.getElementsByTagName('path')[0].setAttribute('stroke-width', '6');
-    //   state.shape.node.getElementsByTagName('path')[0].setAttribute('stroke', 'lightGray');
-    //   state.shape.node.getElementsByTagName('path')[1].setAttribute('class', 'flow');
-
-    //   return selectCells.apply(this, arguments);
-    // }
-
-    mxEdgeHandler.prototype.isConnectableCell = function (cell) { 
-      return graph.connectionHandler.isConnectableCell(cell);
-    };
-
-    // Overridden to define per-shape connection points
-    mxGraph.prototype.getAllConnectionConstraints = function (terminal, source) {
-      
-      // if (terminal && terminal.shape && terminal.shape.constraints) {
-      //   return terminal.shape.constraints;
-      // }
-
-      // return null;
-
-      const { cell } = terminal;
-      const { pointType } = cell;
-
-      if (cell.disabled) {
-        return [];
-      }
-
-      let points = [];
-
-      switch (pointType) {
-        case 'top':
-          points = [
-            new mxConnectionConstraint (new mxPoint (0.5, 0), true), 
-          ];
-          break;
-        case 'left':
-          points = [
-            new mxConnectionConstraint (new mxPoint (0, 0.5), true), 
-          ];
-          break;
-        case 'right':
-          points = [
-            new mxConnectionConstraint (new mxPoint (1, 0.5), true), 
-          ];
-          break;
-        case 'bottom':
-          points = [
-            new mxConnectionConstraint (new mxPoint (0.5, 1), true), 
-          ];
-          break;
-        case 'none':
-          points = [];
-          break;
-        default:
-          points = [
-            new mxConnectionConstraint (new mxPoint (0.25, 0), true), 
-            new mxConnectionConstraint (new mxPoint (0.5, 0), true), 
-            new mxConnectionConstraint (new mxPoint (0.75, 0), true), 
-            new mxConnectionConstraint (new mxPoint (0, 0.25), true), 
-            new mxConnectionConstraint (new mxPoint (0, 0.5), true), 
-            new mxConnectionConstraint (new mxPoint (0, 0.75), true), 
-            new mxConnectionConstraint (new mxPoint (1, 0.25), true), 
-            new mxConnectionConstraint (new mxPoint (1, 0.5), true), 
-            new mxConnectionConstraint (new mxPoint (1, 0.75), true), 
-            new mxConnectionConstraint (new mxPoint (0.25, 1), true), 
-            new mxConnectionConstraint (new mxPoint (0.5, 1), true), 
-            new mxConnectionConstraint (new mxPoint (0.75, 1), true), 
-          ];
-          break;
-      }
-
-      return points;
-    };
-
-    // Defines the default constraints for all shapes
-    mxShape.prototype.constraints = [  
-      
-      // new mxConnectionConstraint(new mxPoint(0.25, 0), true),
-      new mxConnectionConstraint (new mxPoint (0.5, 0), true), 
-      // new mxConnectionConstraint(new mxPoint(0.75, 0), true),
-      // new mxConnectionConstraint(new mxPoint(0, 0.25), true),
-      new mxConnectionConstraint (new mxPoint (0, 0.5), true), 
-      // new mxConnectionConstraint(new mxPoint(0, 0.75), true),
-      // new mxConnectionConstraint(new mxPoint(1, 0.25), true),
-      new mxConnectionConstraint (new mxPoint (1, 0.5), true), 
-      // new mxConnectionConstraint(new mxPoint(1, 0.75), true),
-      // new mxConnectionConstraint(new mxPoint(0.25, 1), true),
-      new mxConnectionConstraint (new mxPoint (0.5, 1), true), 
-      // new mxConnectionConstraint(new mxPoint(0.75, 1), true)
-    ];
-
-    // Edges have no connection points
-    mxPolyline.prototype.constraints = null; 
-
-    // Enables connect preview for the default edge style
-    graph.connectionHandler.createEdgeState = () => {
-      const edge = graph.createEdge(null, null, null, null, null);
-      return new MxCellState (graph.view, edge, graph.getCellStyle (edge)); 
-    };
-
-    // Changes the default style for edges "in-place" and assigns
-    // an alternate edge style which is applied in mxGraph.flip
-    // when the user double clicks on the adjustment control point
-    // of the edge. The ElbowConnector edge style switches to TopToBottom
-    // if the horizontal style is true.
-    const style = graph.getStylesheet().getDefaultEdgeStyle();
-    style[mxConstants.STYLE_ROUNDED] = true; 
-    // style[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector; // 备选：orthogonalEdgeStyle
-    style[mxConstants.STYLE_EDGE] = 'orthogonalEdgeStyle'; 
-    // style[mxConstants.STYLE_STROKEWIDTH] = 1;
-
-    // graph.alternateEdgeStyle = 'elbow=vertical';
-
-    // Snaps to fixed points
-    mxConstraintHandler.prototype.intersects = function (  
-      icon,
-      point,
-      source,
-      existingEdge
-    ) {
-      
-      return !source || existingEdge || mxUtils.intersects (icon.bounds, point); 
-    };
   },
 
   //  Init popmenu
@@ -742,10 +648,7 @@ export default {
       img.style.cursor = 'move';
       img.style.width = '16px';
       img.style.height = '16px';
-      mxEvent.addGestureListeners(  
-        img, 
-        mxUtils.bind(this, function (evt) {  
-          
+      mxEvent.addGestureListeners(img, mxUtils.bind(this, function (evt) {
           this.graph.graphHandler.start(
             this.state.cell,
             mxEvent.getClientX(evt),  
@@ -767,10 +670,7 @@ export default {
       img.style.cursor = 'pointer';
       img.style.width = '16px';
       img.style.height = '16px';
-      mxEvent.addGestureListeners(  
-        img, 
-        mxUtils.bind(this, function (evt) {  
-          
+      mxEvent.addGestureListeners(img, mxUtils.bind(this, function (evt) {          
           const pt = mxUtils.convertPoint(  
             this.graph.container, 
             mxEvent.getClientX(evt),  
@@ -853,162 +753,7 @@ export default {
     graph.getSelectionModel().addListener(mxEvent.CHANGE, (sender, evt) => { 
       callback && callback();
     });
-  },
-
-  handleHover(config) {
-    const { graph, mxConnectionHandler, mxUtils, mxEvent, callback } = config;
-    console.log("handleHover");
-    // Defines an icon for creating new connections in the connection handler.
-    // This will automatically disable the highlighting of the source vertex.
-    mxConnectionHandler.prototype.connectImage = new mxImage('images/connector.gif', 16, 16); 
-
-    // Defines a new class for all icons
-    function mxIconSet(state) {
-      this.images = [];
-      const { graph } = state.view;
-
-      // // pen
-      // var img = mxUtils.createImage('https://img.alicdn.com/tfs/TB1lOfwbPTpK1RjSZKPXXa3UpXa-22-22.png');
-      // img.setAttribute('title', 'Duplicate');
-      // img.style.position = 'absolute';
-      // img.style.cursor = 'pointer';
-      // img.style.width = '16px';
-      // img.style.height = '16px';
-      // img.style.left = (state.x + state.width) + 'px';
-      // img.style.top = (state.y + 10) + 'px';
-
-      // mxEvent.addGestureListeners(img,
-      //   mxUtils.bind(this, function (evt) {
-      //     var s = graph.gridSize;
-      //     // graph.setSelectionCells(graph.moveCells([state.cell], s, s, true));
-
-      //     // graph.model.setValue(state.cell, 'newlabel222');
-
-      //     // 开启 label 可编辑状态
-      //     graph.startEditingAtCell(state.cell);
-
-      //     // 自动聚焦到 label 编辑文本
-      //     state.shape.node.focus();
-
-      //     mxEvent.consume(evt);
-      //     this.destroy();
-      //   })
-      // );
-
-      // state.view.graph.container.appendChild(img);
-      // this.images.push(img);
-
-      // Delete
-      const img = mxUtils.createImage(  
-        'https://img.alicdn.com/tfs/TB1nt90dgHqK1RjSZFkXXX.WFXa-32-32.png'
-      ); 
-      img.setAttribute('title', 'Delete');
-      img.style.position = 'absolute';
-      img.style.cursor = 'pointer';
-      img.style.width = '16px';
-      img.style.height = '16px';
-      img.style.left = `${state.x + state.width}px`;
-      img.style.top = `${state.y - 16}px`;
-
-      mxEvent.addGestureListeners(  
-        img, 
-        mxUtils.bind(this, (evt) => {  
-          
-          // Disables dragging the image
-          mxEvent.consume (evt); 
-        })
-      );
-
-      mxEvent.addListener(  
-        img,
-        'click', 
-        mxUtils.bind(this, function (evt) {  
-          
-          graph.removeCells([state.cell]);
-          mxEvent.consume (evt); 
-          this.destroy();
-        })
-      );
-
-      state.view.graph.container.appendChild(img);
-      this.images.push(img);
-    }
-
-    mxIconSet.prototype.destroy = function () {
-      if (this.images != null) {
-        for (let i = 0; i < this.images.length; i += 1) {
-          const img = this.images[i];
-          img.parentNode.removeChild(img);
-        }
-      }
-
-      this.images = null;
-    };
-
-    // Defines the tolerance before removing the icons
-    const iconTolerance = 20;
-
-    // Shows icons if the mouse is over a cell
-    graph.addMouseListener({
-      currentState: null,
-      currentIconSet: null,
-      mouseDown(sender, me) {
-        // Hides icons on mouse down
-        if (this.currentState != null) {
-          this.dragLeave(me.getEvent(), this.currentState);
-          this.currentState = null;
-        }
-      },
-      mouseMove(sender, me) {
-        let tmp;
-
-        if (this.currentState != null && (me.getState() === this.currentState || me.getState() == null)) {
-          const tol = iconTolerance;
-          tmp = new mxRectangle(me.getGraphX () - tol, me.getGraphY() - tol, 2 * tol, 2 * tol);
-
-          if (mxUtils.intersects(tmp, this.currentState)) {
-            return;
-          }
-        }
-
-        tmp = graph.view.getState(me.getCell());
-
-        // Ignores everything but vertices
-        if (graph.isMouseDown || (tmp != null && !graph.getModel().isVertex(tmp.cell))) {
-          tmp = null;
-        }
-
-        if (tmp !== this.currentState) {
-          if (this.currentState != null) {
-            this.dragLeave(me.getEvent(), this.currentState);
-          }
-
-          this.currentState = tmp;
-
-          if (this.currentState != null) {
-            this.dragEnter(me.getEvent(), this.currentState);
-          }
-        }
-      },
-      mouseUp (sender, me) {}, 
-      dragEnter(evt, state) {
-        const { cell } = state;
-        const { disabled } = cell;
-
-        if (this.currentIconSet === null && !disabled) {
-          this.currentIconSet = new mxIconSet (state); 
-        }
-
-        callback && callback(evt, state);
-      },
-      dragLeave(evt, state) {          
-        if (this.currentIconSet != null) {
-          this.currentIconSet.destroy();
-          this.currentIconSet = null;
-        }
-      },
-    });
-  },
+  }, 
 
   htmlLable(config) {
     const { graph, mxUtils } = config;
@@ -1165,17 +910,10 @@ export default {
 
       decoder.decode(formatedNode, graph.getModel());
     }
-  },
-
-  // 自定义锚点
-  initCustomPort(config) {
-    const { pic, mxConstraintHandler } = config;
-    // Replaces the port image
-    mxConstraintHandler.prototype.pointImage = new mxImage (pic, 10, 10); 
-  },
+  },  
 
   /**
-   * 初始化缩放配置
+   * Initialize zoom configuration
    */
   initZoomConfig(config) {
     const { graph } = config;
@@ -1183,7 +921,6 @@ export default {
     graph.centerZoom = true;
   },
 
-  // 缩放
   zoom(config) {
     const { graph, type } = config;
 

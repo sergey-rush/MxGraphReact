@@ -23,6 +23,8 @@ export default class Editor {
     let graph = new mxnspaceobj.mxGraph(containerEle);
 
     let mxRubberband = mxnspaceobj.mxRubberband;
+        // Enables rubberband selection
+        new mxRubberband(graph);
     let mxUtils = mxnspaceobj.mxUtils;
     let mxEvent = mxnspaceobj.mxEvent;
     let mxVertexHandler = mxnspaceobj.mxVertexHandler;
@@ -45,11 +47,12 @@ export default class Editor {
     let mxClient = mxnspaceobj.mxClient;
     let mxDragSource = mxnspaceobj.mxDragSource;
     let mxClipboard = mxnspaceobj.mxClipboard;
+    let mxGraphView = mxnspaceobj.mxGraphView;
 
     // Disables the built-in context menu
     mxEvent.disableContextMenu(containerEle); // eslint-disable-line
     mxVertexHandler.prototype.rotationEnabled = true; // eslint-disable-line
-    new mxRubberband(graph);
+    
     this.containerEle = containerEle;
 
     this.initEditor({
@@ -75,6 +78,7 @@ export default class Editor {
       mxStencilRegistry,
       mxClient,
       mxClipboard,
+      mxGraphView,
     });
 
     this.graph = graph;
@@ -111,6 +115,7 @@ export default class Editor {
       mxStencilRegistry,
       mxClient,
       mxClipboard,
+      mxGraphView,
       clickFunc,
       doubleClickFunc,
       autoSaveFunc,
@@ -148,44 +153,32 @@ export default class Editor {
       SVG_SHAPES,
     });
 
-    // undo event listener
-    // util.undoListener({
-    //   graph,
-    //   mxEvent,
-    //   mxUndoManager,
-    //   callback: undoFunc,
-    // });
+    util.initGrid({
+      graph,
+      mxGraphView,
+      mxEvent
+    });
 
-    // copy event listener
-    // util.copyListener({
-    //   graph,
-    //   mxClipboard,
-    //   callback: copyFunc,
-    // });
+    //undo event listener
+    util.undoListener({
+      graph,
+      mxEvent,
+      mxUndoManager,
+      callback: undoFunc,
+    });
 
-    // delete event listener
-    // util.deleteListener({
-    //   graph,
-    //   callback: deleteFunc,
-    // });
+    //copy event listener
+    util.copyListener({
+      graph,
+      mxClipboard,
+      callback: copyFunc,
+    });
 
-    // connector handler
-    // util.connectorHandler({
-    //   graph,
-    //   mxUtils,
-    //   mxGraph,
-    //   mxShape,
-    //   mxGraphHandler,
-    //   mxEdgeHandler,
-    //   mxConnectionConstraint,
-    //   mxPolyline,
-    //   mxConstraintHandler,
-    //   mxConstants,
-    // });
-
-    // util.initConnectStyle({
-    //   graph,
-    // });
+    //delete event listener
+    util.deleteListener({
+      graph,
+      callback: deleteFunc,
+    });  
 
     util.handleDoubleClick({
       graph,
@@ -197,15 +190,7 @@ export default class Editor {
       graph,
       mxEvent,
       callback: clickFunc,
-    });
-
-    // util.handleHover({
-    //   graph,
-    //   mxConnectionHandler,
-    //   mxUtils,
-    //   mxEvent,
-    //   callback: hoverFunc,
-    // });
+    });  
 
     util.handleChange({
       graph,
@@ -235,12 +220,7 @@ export default class Editor {
       sidebarItems,
       cellCreatedFunc: this.cellCreatedFunc,
     });
-  }
-
-  // custom port, 10x10px
-  initCustomPort(pic) {
-    return util.initCustomPort({pic, mxConstraintHandler: this.mxConstraintHandler, });
-  }
+  }  
 
   /**
    * zoom
