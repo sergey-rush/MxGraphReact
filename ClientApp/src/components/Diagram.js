@@ -137,7 +137,7 @@ export class Diagram extends Component {
           <Col xs={1}>
           <SideBar key="sidebar" editor={this.editor} />
           </Col>
-          <Col xs={9}>
+          <Col xs={10}>
           <div className="graph-inner-container">
           {this.editor ? (
                 <Toolbar
@@ -148,7 +148,7 @@ export class Diagram extends Component {
           <div id="mxcontainer" className="graph-content" key="graphcontent" />
           </div>
           </Col>
-          <Col xs={2}>            
+          <Col xs={1}>            
             <CellView editor={this.editor} activeCell ={this.state.currentCell} />
             </Col>
         </Row>
