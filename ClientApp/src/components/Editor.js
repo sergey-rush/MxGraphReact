@@ -79,6 +79,7 @@ export default class Editor {
       mxClient,
       mxClipboard,
       mxGraphView,
+      mxVertexHandler
     });
 
     this.graph = graph;
@@ -116,6 +117,7 @@ export default class Editor {
       mxClient,
       mxClipboard,
       mxGraphView,
+      mxVertexHandler,
       clickFunc,
       doubleClickFunc,
       autoSaveFunc,
@@ -178,7 +180,7 @@ export default class Editor {
     util.deleteListener({
       graph,
       callback: deleteFunc,
-    });  
+    });
 
     util.handleDoubleClick({
       graph,
