@@ -8,15 +8,22 @@ export default class Preview extends Component {
     this.state = { editor: null };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    console.log("Preview componentDidMount");
+  }
 
   componentDidUpdate() {
     console.log("Preview componentDidUpdate");
+    const { editor } = this.props;
+    if (editor) {
+      let preview = document.getElementById('preview');
+      editor.initPreview(preview);
+    }
   }
 
   render() {
     return (
-      <div className="preview">
+      <div id="preview" className="preview">
         <p>Outline window</p>
       </div>
     );

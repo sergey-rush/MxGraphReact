@@ -36,6 +36,7 @@ export class Diagram extends Component {
       doubleClickFunc: this.doubleClickFunc,
       autoSaveFunc: this.autoSaveFunc,
       cellCreatedFunc: this.cellCreatedFunc,
+      previewCreatedFunc:this.previewCreatedFunc,
       deleteFunc: this.deleteFunc,
       undoFunc: this.undoFunc,
       copyFunc: this.copyFunc,
@@ -87,6 +88,10 @@ export class Diagram extends Component {
     const labelName = currentCell.value;
 
     this.editor.renameCell(`${labelName}${sameShapeNameCount}`, currentCell);
+  };
+
+  previewCreatedFunc = (output) => {
+    console.log("Diagram previewCreatedFunc: " + output);
   };
 
   deleteFunc = (cells) => {

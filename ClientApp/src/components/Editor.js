@@ -11,7 +11,7 @@ export default class Editor {
   }
 
   init(props) {
-    const { container, cellCreatedFunc, valueChangeFunc } = props;
+    const { container, cellCreatedFunc, previewCreatedFunc, valueChangeFunc } = props;
 
     let containerEle = document.querySelector(container);
     if (typeof container === "string") {
@@ -48,6 +48,7 @@ export default class Editor {
     let mxDragSource = mxnspaceobj.mxDragSource;
     let mxClipboard = mxnspaceobj.mxClipboard;
     let mxGraphView = mxnspaceobj.mxGraphView;
+    let mxResources = mxnspaceobj.mxResources;
 
     // Disables the built-in context menu
     mxEvent.disableContextMenu(containerEle); // eslint-disable-line
@@ -85,11 +86,14 @@ export default class Editor {
     this.graph = graph;
     this.mxClient = mxClient;
     this.cellCreatedFunc = cellCreatedFunc;
+    this.previewCreatedFunc = previewCreatedFunc;
     this.mxUtils = mxUtils;
     this.mxEvent = mxEvent;
     this.mxDragSource = mxDragSource;
     this.mxConstraintHandler = mxConstraintHandler;
     this.valueChangeFunc = valueChangeFunc;
+    this.mxResources = mxResources;
+    this.mxConstants = mxConstants;
   }
 
   initEditor(config) {
@@ -227,7 +231,12 @@ export default class Editor {
   initPreview(preview) {
     return util.initPreview({
       graph: this.graph,
-      preview
+      mxResources:this.mxResources,
+      mxUtils:this.mxUtils,
+      mxEvent:this.mxEvent,
+      mxConstants:this.mxConstants,
+      preview,
+      previewCreatedFunc:this.previewCreatedFunc
     });
   } 
 

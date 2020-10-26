@@ -12,30 +12,19 @@ export default class CellView extends Component {
 
   componentDidUpdate() {
     //console.log("CellView componentDidUpdate");
-    this.handleSidebarItems();
+    this.handleCellView();
   }
 
-  handleSidebarItems() {
+  handleCellView() {
     const { editor } = this.props;
 
-    if (editor && editor.initSidebar) {
-      const sidebarItems = document.querySelectorAll(".custom-sidebar-node");
-
-      const newSidebarItems = Array.from(sidebarItems).filter((item) => {
-        if (!item.classList.contains("has-inited")) {
-          item.classList.add("has-inited");
-          return true;
-        }
-        return false;
-      });
-
-      editor.initSidebar(newSidebarItems);
+    if (editor) {
     }
   }
 
   onChange() {
     setTimeout(() => {
-      this.handleSidebarItems();
+      this.handleCellView();
     }, 1000);
   }
 
