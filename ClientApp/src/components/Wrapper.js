@@ -1,9 +1,3 @@
-import DEFAULT_CARD_SHAPES from "../config/card-shape";
-import DEFAULT_IMAGE_SHAPES from "../config/image-shape";
-
-import STENCILS from "../config/stencils/index";
-import GENERAL_SHAPES from "../config/general-shape";
-//import './basic-shapes-generator';
 import MxCellState from "mxgraph";
 import mxAutoSaveManager from "mxgraph";
 import MxPoint from "mxgraph";
@@ -61,9 +55,7 @@ export default {
       mxConstants,
       mxPerimeter,
       mxStencilRegistry,
-      IMAGE_SHAPES,
-      CARD_SHAPES,
-      SVG_SHAPES,
+      Shapes,
     } = config;
 
     const { stylesheet } = graph;
@@ -74,17 +66,13 @@ export default {
     vertexStyle[mxConstants.STYLE_FONTCOLOR] = "#000";
 
     const edgeStyle = stylesheet.getDefaultEdgeStyle();
-    edgeStyle['edgeStyle'] = 'orthogonalEdgeStyle';
-    edgeStyle['curved'] = '1';
+    edgeStyle["edgeStyle"] = "orthogonalEdgeStyle";
+    edgeStyle["curved"] = "1";
     edgeStyle[mxConstants.STYLE_STROKECOLOR] = "#B9BECC";
     edgeStyle[mxConstants.STYLE_STROKEWIDTH] = 2;
     edgeStyle[mxConstants.STYLE_FONTCOLOR] = "#000";
 
-    const cardShapes = CARD_SHAPES || DEFAULT_CARD_SHAPES;
-    const imageShapes = IMAGE_SHAPES || DEFAULT_IMAGE_SHAPES;
-    const svgShapes = { custom: SVG_SHAPES, ...STENCILS };
-
-    this.imageShapes = imageShapes;
+    this.imageShapes = Shapes;
 
     const imageStyle = {};
     imageStyle[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_IMAGE;
@@ -92,45 +80,6 @@ export default {
     // style[mxConstants.STYLE_IMAGE] = cardShapes[name];
     imageStyle[mxConstants.STYLE_FONTCOLOR] = "#333";
     graph.getStylesheet().putCellStyle("image", imageStyle);
-
-    cardShapes &&
-      cardShapes.forEach((shape) => {
-        const style = mxUtils.clone(imageStyle);
-        style[mxConstants.STYLE_SHAPE] = mxConstants.SHAPE_LABEL;
-        style[mxConstants.STYLE_ALIGN] = mxConstants.ALIGN_CENTER;
-        style[mxConstants.STYLE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
-        style[mxConstants.STYLE_IMAGE_ALIGN] = mxConstants.ALIGN_CENTER;
-        style[mxConstants.STYLE_IMAGE_VERTICAL_ALIGN] = mxConstants.ALIGN_TOP;
-        style[mxConstants.STYLE_IMAGE] = shape.logo;
-        style[mxConstants.STYLE_IMAGE_WIDTH] = "30";
-        style[mxConstants.STYLE_IMAGE_HEIGHT] = "30";
-        style[mxConstants.STYLE_SPACING_TOP] = "46";
-        style[mxConstants.STYLE_SPACING] = "8";
-        style[mxConstants.STYLE_ROUNDED] = 1;
-        style[mxConstants.STYLE_ARCSIZE] = 10;
-        style[mxConstants.STYLE_STROKECOLOR] = "#ffffff";
-        style[mxConstants.STYLE_FILLCOLOR] = "#ffffff";
-        graph.getStylesheet().putCellStyle(shape.key, style);
-      });
-
-    svgShapes &&
-      Object.keys(svgShapes).forEach((name) => {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(svgShapes[name], "text/xml"); // important to use "text/xml"
-        const root = xmlDoc.firstChild;
-        let shape = root.firstChild;
-
-        while (shape != null) {
-          if (shape.nodeType === mxConstants.NODETYPE_ELEMENT) {
-            mxStencilRegistry.addStencil(
-              shape.getAttribute("name"),
-              new mxStencil(shape)
-            );
-          }
-
-          shape = shape.nextSibling;
-        }
-      });
   },
 
   initGrid(config) {
@@ -253,7 +202,7 @@ export default {
   },
 
   initPreview(config) {
-    const {graph, preview, callback} = config;
+    const { graph, preview, callback } = config;
     let outln = new MxOutline(graph, preview);
     callback && callback(outln);
   },
@@ -269,7 +218,8 @@ export default {
       cellCreatedFunc,
     } = config;
 
-    sidebarItems && sidebarItems.forEach((item) => {
+    sidebarItems &&
+      sidebarItems.forEach((item) => {
         const width = item.getAttribute("data-shape-width");
         const height = item.getAttribute("data-shape-height");
         const shapeType = item.getAttribute("data-shape-type");
@@ -278,26 +228,11 @@ export default {
         const shapeContent = item.getAttribute("data-shape-content");
         let isEdge = false;
 
-        let shapeStyle = shapeName;
+        const shape = this.findItemFromArray(this.imageShapes, {
+          key: shapeName,
+        });        
 
-        if (shapeType === "svg") {
-          shapeStyle = `shape=${shapeName}`;
-        } else if (shapeType === "general") {
-          if (GENERAL_SHAPES[shapeName].type === "edge") {
-            isEdge = true;
-          }
-          shapeStyle = GENERAL_SHAPES[shapeName].style;
-        } else if (shapeType === "image") {
-          const shape = this.findItemFromArray(this.imageShapes, {
-            key: shapeName,
-          });
-
-          const img = shape.logo;
-
-          shapeStyle = `shape=image;html=1;verticalLabelPosition=bottom;fontColor:#fff;verticalAlign=top;imageAspect=0;image=${img}`;
-        } else if (shapeType === "card") {
-          shapeStyle = `${shapeName}`;
-        }
+        let shapeStyle = `shape=image;html=1;verticalLabelPosition=bottom;fontColor:#fff;verticalAlign=top;imageAspect=0;image=${shape.logo}`;
 
         this.createDragableItem({
           id: `cell${Date.now()}`,
@@ -647,7 +582,10 @@ export default {
         if (idsArr.indexOf(cellId) === -1) {
           idsArr.push(cellId);
         } else {
-          console.warn("cell id is duplicated, delete the needless one", element);
+          console.warn(
+            "cell id is duplicated, delete the needless one",
+            element
+          );
           rootEle.removeChild(element);
         }
 
@@ -656,7 +594,10 @@ export default {
           element.getAttribute("vertex") === "1" &&
           element.getAttribute("edge") === "1"
         ) {
-          console.warn("cell's property vertex and edge cannot both be 1, set property edge to 0", element);
+          console.warn(
+            "cell's property vertex and edge cannot both be 1, set property edge to 0",
+            element
+          );
           element.setAttribute("edge", 0);
         }
       });
@@ -694,7 +635,10 @@ export default {
     node.setAttribute("gridSize", graph.gridSize);
     node.setAttribute("guides", graph.graphHandler.guidesEnabled ? "1" : "0");
     node.setAttribute("tooltips", graph.tooltipHandler.isEnabled() ? "1" : "0");
-    node.setAttribute("connect", graph.connectionHandler.isEnabled() ? "1" : "0");
+    node.setAttribute(
+      "connect",
+      graph.connectionHandler.isEnabled() ? "1" : "0"
+    );
     node.setAttribute("arrows", graph.connectionArrowsEnabled ? "1" : "0");
     node.setAttribute("fold", graph.foldingEnabled ? "1" : "0");
     node.setAttribute("page", graph.pageVisible ? "1" : "0");

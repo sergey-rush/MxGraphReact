@@ -1,4 +1,4 @@
-import util from "./Utils";
+import wr from "./Wrapper";
 
 var mxnspaceobj = require("mxgraph")({
   mxImageBasePath: "mxgraph/javascript/src/images",
@@ -131,9 +131,7 @@ export default class Editor {
       copyFunc,
       valueChangeFunc,
       changeFunc,
-      IMAGE_SHAPES,
-      CARD_SHAPES,
-      SVG_SHAPES,
+      Shapes
     } = config;
 
     // Disables the built-in context menu
@@ -143,30 +141,28 @@ export default class Editor {
     // to fit the size of the graph
     // graph.setResizeContainer(true);
 
-    util.initGraph({ graph });
+    wr.initGraph({ graph });
 
-    util.initZoomConfig({ graph });
+    wr.initZoomConfig({ graph });
 
     // config shapes
-    util.initShapes({
+    wr.initShapes({
       graph,
       mxUtils,
       mxConstants,
       mxPerimeter,
       mxStencilRegistry,
-      IMAGE_SHAPES,
-      CARD_SHAPES,
-      SVG_SHAPES,
+      Shapes
     });
 
-    util.initGrid({
+    wr.initGrid({
       graph,
       mxGraphView,
       mxEvent
     });
 
     //undo event listener
-    util.undoListener({
+    wr.undoListener({
       graph,
       mxEvent,
       mxUndoManager,
@@ -174,42 +170,42 @@ export default class Editor {
     });
 
     //copy event listener
-    util.copyListener({
+    wr.copyListener({
       graph,
       mxClipboard,
       callback: copyFunc,
     });
 
     //delete event listener
-    util.deleteListener({
+    wr.deleteListener({
       graph,
       callback: deleteFunc,
     });
 
-    util.handleDoubleClick({
+    wr.handleDoubleClick({
       graph,
       mxEvent,
       callback: doubleClickFunc,
     });
 
-    util.handleClick({
+    wr.handleClick({
       graph,
       mxEvent,
       callback: clickFunc,
     });  
 
-    util.handleChange({
+    wr.handleChange({
       graph,
       mxEvent,
       callback: changeFunc,
     });
 
-    util.initAutoSave({
+    wr.initAutoSave({
       graph,
       callback: autoSaveFunc,
     });
 
-    util.vertexRenameListener({
+    wr.vertexRenameListener({
       callback: valueChangeFunc,
       mxCell,
     });
@@ -217,7 +213,7 @@ export default class Editor {
 
   
   initSidebar(sidebarItems) {
-    return util.initSidebar({
+    return wr.initSidebar({
       graph: this.graph,
       mxEvent: this.mxEvent,
       mxClient: this.mxClient,
@@ -229,7 +225,7 @@ export default class Editor {
   }
 
   initPreview(preview) {
-    return util.initPreview({
+    return wr.initPreview({
       graph: this.graph,
       mxResources:this.mxResources,
       mxUtils:this.mxUtils,
@@ -245,7 +241,7 @@ export default class Editor {
    * type: in、out、actual
    */
   zoom(type) {
-    return util.zoom({
+    return wr.zoom({
       type,
       graph: this.graph,
     });
@@ -258,7 +254,7 @@ export default class Editor {
    * @param {*} value the value of style
    */
   updateStyle(cell, key, value) {
-    return util.updateStyle(this.graph, this.mxUtils, cell, key, value);
+    return wr.updateStyle(this.graph, this.mxUtils, cell, key, value);
   }
 
   groupCells(groupId, labelName) {
@@ -274,11 +270,11 @@ export default class Editor {
         item.isGrouped = true;
       });
 
-    // util.updateStyle(this.graph, cell, 'strokeColor', 'none');
-    util.updateStyle(this.graph, cell, "fillColor", "none");
-    util.updateStyle(this.graph, cell, "dashed", 1);
-    util.updateStyle(this.graph, cell, "verticalLabelPosition", "bottom");
-    util.updateStyle(this.graph, cell, "verticalAlign", "top");
+    // wr.updateStyle(this.graph, cell, 'strokeColor', 'none');
+    wr.updateStyle(this.graph, cell, "fillColor", "none");
+    wr.updateStyle(this.graph, cell, "dashed", 1);
+    wr.updateStyle(this.graph, cell, "verticalLabelPosition", "bottom");
+    wr.updateStyle(this.graph, cell, "verticalAlign", "top");
 
     return { groupCell: cell, cellsGrouped };
   }
@@ -343,7 +339,7 @@ export default class Editor {
    * @param {string} xml xml
    */
   renderGraphFromXml(xml) {
-    return util.renderGraphFromXml({
+    return wr.renderGraphFromXml({
       graph: this.graph,
       mxUtils: this.mxUtils,
       xml,
@@ -354,7 +350,7 @@ export default class Editor {
    * get xml of the graph
    */
   getGraphXml() {
-    const xml = util.getGraphXml({
+    const xml = wr.getGraphXml({
       graph: this.graph,
       mxUtils: this.mxUtils,
     });
@@ -425,7 +421,7 @@ export default class Editor {
   }
 
   removeEventListeners() {
-    return util.removeEventListeners();
+    return wr.removeEventListeners();
   }
 
   /**
@@ -434,7 +430,7 @@ export default class Editor {
    * @param {*} cell a cell
    */
   renameCell(newName, cell) {
-    return util.renameCell(newName, cell, this.graph);
+    return wr.renameCell(newName, cell, this.graph);
   }
 
   /**
@@ -452,10 +448,10 @@ export default class Editor {
   }
 
   startPanning() {
-    return util.startPanning(this.graph);
+    return wr.startPanning(this.graph);
   }
 
   stopPanning() {
-    return util.stopPanning(this.graph);
+    return wr.stopPanning(this.graph);
   }
 }

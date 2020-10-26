@@ -6,10 +6,7 @@ import Toolbar from "./Toolbar";
 import Editor from './Editor';
 import CellView from './CellView';
 import Preview from './Preview';
-
-import IMAGE_SHAPES from '../shapes/basic-shape';
-import CARD_SHAPES from '../shapes/card-shape';
-import SVG_SHAPES from '../shapes/svg-shape.xml';
+import Shapes from './ShapeList';
 
 import './Diagram.css';
 
@@ -41,9 +38,7 @@ export class Diagram extends Component {
       undoFunc: this.undoFunc,
       copyFunc: this.copyFunc,
       valueChangeFunc: this.valueChangeFunc,
-      IMAGE_SHAPES,
-      CARD_SHAPES,
-      SVG_SHAPES
+      Shapes
     });
 
     this.editor = editor;
@@ -139,6 +134,20 @@ export class Diagram extends Component {
     return (
       <Container fluid> 
       <div className="editor-container">
+      <Row>
+          <Col xs={1}>
+            <h6>Toolbox</h6>
+          </Col>
+          <Col xs={10}>
+          <Toolbar
+                  editor={this.editor}
+                  updateDiagramData={this.updateDiagramData}
+                />
+          </Col>
+          <Col xs={1}>
+          <h6>Properties</h6>
+          </Col>
+        </Row>
         <Row>
           <Col xs={1}>
           <SideBar key="sidebar" editor={this.editor} />
@@ -146,12 +155,7 @@ export class Diagram extends Component {
           </Col>
           <Col xs={10}>
           <div className="graph-inner-container">
-          {this.editor ? (
-                <Toolbar
-                  editor={this.editor}
-                  updateDiagramData={this.updateDiagramData}
-                />
-              ) : null}
+          
           <div id="mxcontainer" className="graph-content" key="graphcontent" />
           </div>
           </Col>
