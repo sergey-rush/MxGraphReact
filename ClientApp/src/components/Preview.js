@@ -9,11 +9,11 @@ export default class Preview extends Component {
   }
 
   componentDidMount() {
-    console.log("Preview componentDidMount");
+    //console.log("Preview componentDidMount");
   }
 
   componentDidUpdate() {
-    console.log("Preview componentDidUpdate");
+    //console.log("Preview componentDidUpdate");
     const { editor } = this.props;
     if (editor) {
       let preview = document.getElementById('preview');
